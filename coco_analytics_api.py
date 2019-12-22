@@ -53,8 +53,7 @@ def get_ob_index(datapath, categories):
         if count == 10:
             return list_idx
 def make_xml(coco_info):
-    root = et.Element('root')
-    tree = et.ElementTree(element=root)
+    root = et.Element('annotation')
 
     fruits = et.SubElement(root, 'fruits')
      
@@ -73,11 +72,13 @@ def make_xml(coco_info):
     ####
     # 文字列パースを介してminidomへ移す
     document = md.parseString(et.tostring(root))
-    #document = md.parseString(et.tostring(root, 'utf-8'))
     file = open('test.xml', 'w')
     # エンコーディング、改行、全体のインデント、子要素の追加インデントを設定しつつファイルへ書き出し
-    document.writexml(file, newl='\n', indent='', addindent='  ')
+    document.writexml(file, encoding='utf-8', newl='\n', indent='', addindent='  ')
     file.close()
+    #xmlタグを消した
+    tree = et.parse('test.xml') 
+    tree.write('test.xml')
     #####
 
 if __name__ == "__main__":
