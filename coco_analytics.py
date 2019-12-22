@@ -1,6 +1,6 @@
 import json
 
-with open("/home/gisen/data/coco/annotations/annotations/instances_train2014.json", "rb") as file:
+with open("/Users/gisen/data/coco/annotations/annotations/instances_train2014.json", "rb") as file:
     dataset = json.load(file)
 
 print(dataset.keys())
@@ -8,23 +8,23 @@ print(dataset.keys())
 print("=============\n")
 #print(dataset['annotations'][0])
 
-img_indexes = set([])
-img_num1 = set([])
-img_num2 = set([])
-img_num3 = set([])
-img_num4 = set([])
-img_num5 = set([])
-img_num6 = set([])
-img_num7 = set([])
-img_num8 = set([])
-img_num9 = set([])
-img_num10 = set([])
+img_indexes = set()
+img_num1 = set()
+img_num2 = set()
+img_num3 = set()
+img_num4 = set()
+img_num5 = set()
+img_num6 = set()
+img_num7 = set()
+img_num8 = set()
+img_num9 = set()
+img_num10 = set()
 categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
 
 count = 0
 for item in dataset['annotations']:
-    count += 1
     if item["category_id"] in categories:
+        count += 1
         img_indexes.add(item["image_id"])
         if item["category_id"] == 1:
             img_num1.add(item["image_id"])
@@ -48,9 +48,8 @@ for item in dataset['annotations']:
             img_num10.add(item["image_id"])
 
 #print(img_indexes) 
-print("ほしいカテゴリだけの総数: ", len(img_indexes))
-print("元データの総数：", count)
-
+print("ほしいカテゴリだけの総数(img_indexes): ", len(img_indexes))
+print("元データの総数(count)：", count)
 print("img_num1:", len(img_num1))
 print("img_num2:", len(img_num2))
 print("img_num3:", len(img_num3))
