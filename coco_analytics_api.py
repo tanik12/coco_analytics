@@ -1,5 +1,7 @@
 import json
 from pycocotools.coco import COCO
+import xml.etree.ElementTree as et
+import xml.dom.minidom as md
 
 def get_ob_index(datapath, categories):
     with open(datapath, "rb") as file:
@@ -50,8 +52,37 @@ def get_ob_index(datapath, categories):
         print("================")
         if count == 10:
             return list_idx
+def make_xml(coco_info):
+    root = et.Element('root')
+    tree = et.ElementTree(element=root)
+
+    fruits = et.SubElement(root, 'fruits')
+     
+    fruit = et.SubElement(fruits, 'fruit')
+    fruit_id = et.SubElement(fruit, 'name')
+    fruit_id.text = 'apple'
+    fruit_id = et.SubElement(fruit, 'price')
+    fruit_id.text = '100'
+     
+    fruit = et.SubElement(fruits, 'fruit')
+    fruit_id = et.SubElement(fruit, 'name')
+    fruit_id.text = 'orange'
+    fruit_id = et.SubElement(fruit, 'price')
+    fruit_id.text = '200'
+
+    ####
+    # 文字列パースを介してminidomへ移す
+    document = md.parseString(et.tostring(root))
+    #document = md.parseString(et.tostring(root, 'utf-8'))
+    file = open('test.xml', 'w')
+    # エンコーディング、改行、全体のインデント、子要素の追加インデントを設定しつつファイルへ書き出し
+    document.writexml(file, newl='\n', indent='', addindent='  ')
+    file.close()
+    #####
 
 if __name__ == "__main__":
     datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
-    print('get_ob_index: ', get_ob_index(datapath, categories))
+    #print('get_ob_index: ', get_ob_index(datapath, categories))
+    coco_info = get_ob_index(datapath, categories)
+    print(make_xml(coco_info))
