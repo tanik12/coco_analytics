@@ -11,26 +11,41 @@ def get_ob_index(datapath, categories):
     count = 0
     for img_idx in dataset['images']:
         s_dict = {}
-        li = []
+        anno_idxes = []
+        bboxes = []
+        category_idxes = []
 
-        img_idx = img_idx['file_name'].replace("COCO_train2014_", "").replace(".jpg", "").lstrip("0")
-        imgs = coco.getAnnIds(int(img_idx))
-        print("anno_num: ", imgs)
+        #画像名から番号を取得
+        #coco.getAnnIds(画像番号)により、画像番号に紐づいたアノテーション番号を取得できる.
+        file_number = img_idx['file_name'].replace("COCO_train2014_", "").replace(".jpg", "").lstrip("0")
+        annos_num = coco.getAnnIds(int(file_number)) #指定した画像ID に対応するアノテーション ID を取得する。
+        print("anno_num: ", annos_num)
         
-        for idx, i in enumerate(imgs):
-            test = coco.loadAnns(i)
-            if test[0]["category_id"] in categories: #欲しいカテゴリがあるかどうか
-                li.append(i)
-        if len(li) < 1:
+        for anno_num in annos_num:
+            anno_info = coco.loadAnns(anno_num) #loadAnns で指定したアノテーション ID の情報を取得する。
+            if anno_info[0]["category_id"] in categories: #欲しいカテゴリがあるかどうか
+                anno_idxes.append(anno_num) #annotationの番号を入れる。
+        if len(anno_idxes) < 1: #欲しいカテゴリがないのであればスキップ
             print("non indx")
             print("===============")
             continue
-
+        else:           #欲しいカテゴリがあれば、元imageの[高さ, 幅]とannotationからbboxとcategory_idを取得
+            height = img_idx["height"]
+            width = img_idx["width"]
+            for k in anno_idxes:
+                bboxes.append(coco.loadAnns(k)[0]['bbox'])
+                category_idxes.append(coco.loadAnns(k)[0]['category_id'])
         count += 1
-        print("ano_num2: ", li)
+        print("ano_num2: ", anno_idxes)
         print("\n")
-        s_dict["img_idx"] = int(img_idx)
-        s_dict["anno_dix"] = li
+
+        #imageに紐づいた情報を取得.
+        #画像名、画像に紐づいたアノテーションの番号、元画像の[高さ, 幅]、annotationに紐づくbboxes、category_idに紐づいたbboxを辞書に入れる.
+        s_dict["img_number"] = img_idx['file_name']
+        s_dict["anno_dix"] = anno_idxes
+        s_dict["img_hw"] = [height, width]
+        s_dict["bboxes"] = bboxes
+        s_dict["category_id"] = category_idxes
         list_idx.append(s_dict)
         print("================")
         if count == 10:
