@@ -7,6 +7,7 @@ import os
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
+import shutil
 
 def cofirm_dir():
     current_path = os.getcwd()
@@ -147,14 +148,23 @@ def one_detection_debug():
     img = cv2.rectangle(img,(314,174),(328,195),(255,255,0),3)
     cv2.imwrite("./debug/rect_text.jpg", img)
 
+def make_img(coco_img_path, coco_info):
+    current_path = os.getcwd()
+    img_dir = "./images/train2014/"
+    for item in coco_info:
+        img_name = item["img_number"]
+        full_path = coco_img_path + img_name
+        shutil.copy(full_path, img_dir + img_name)
+
 if __name__ == "__main__":
-    datapath = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     #datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    coco_img_path = "/home/gisen/data/coco/images/train2014/"
     categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
     label_dic = {1:"person", 2:"bicycle", 3:"car", 4:"motorbike", 6:"bus", 8:"truck", 10:"traffic light", 16:"bird", 17:"cat", 18:"dog"}
-    #print('get_ob_index: ', get_ob_index(datapath, categories))
 
     cofirm_dir()
-    coco_info = get_ob_index(datapath, categories)
-    print(make_xml(coco_info, label_dic))
+    coco_info = get_ob_index(coco_json_path, categories)
+    make_xml(coco_info, label_dic)
     one_detection_debug()
+    make_img(coco_img_path, coco_info)
