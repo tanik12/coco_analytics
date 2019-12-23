@@ -4,10 +4,11 @@ import xml.etree.ElementTree as et
 import xml.dom.minidom as md
 import numpy as np
 import os
+import shutil
+
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
-import shutil
 
 #ディレクトリの存在確認をする処理。
 #ないのであればディレクトリを作成。
@@ -79,6 +80,7 @@ def get_ob_info(datapath, categories):
         s_dict["bboxes"] = bboxes
         s_dict["category_id"] = category_idxes
         list_idx.append(s_dict)
+
         print("================")
         if count == 10:
             return list_idx
@@ -142,9 +144,18 @@ def make_xml(coco_info, label_dic):
         tree = et.parse("./annotation/" + img_name.replace(".jpg", ".xml")) 
         tree.write("./annotation/" + img_name.replace(".jpg", ".xml"))
 
-#指定した画像できちんと物体の位置が特定できているかDebugするための処理。
+#アノテーションの情報を基にcocoで使用している画像をコピーする処理。
+def make_img(coco_img_path, coco_info):
+    current_path = os.getcwd()
+    img_dir = "./images/train2014/"
+    for item in coco_info:
+        img_name = item["img_number"]
+        full_path = coco_img_path + img_name
+        shutil.copy(full_path, img_dir + img_name)
+
+#指定した画像できちんと物体の位置が特定できているかDebugするための処理。(1枚だけ)
 def one_detection_debug():
-    img_path = "./debug/COCO_train2014_000000392136.jpg"
+    img_path = "./debug_img.jpg"
     img = cv2.imread(img_path)
 
     # 長方形（水色の長方形）
@@ -157,16 +168,22 @@ def one_detection_debug():
     img = cv2.rectangle(img,(390,170),(413,196),(255,255,0),3)
     img = cv2.rectangle(img,(457,163),(478,281),(255,255,0),3)
     img = cv2.rectangle(img,(314,174),(328,195),(255,255,0),3)
-    cv2.imwrite("./debug/rect_text.jpg", img)
+    cv2.imwrite("./debug_img_out.jpg", img)
 
-#アノテーションの情報を基にcocoで使用している画像をコピーする処理。
-def make_img(coco_img_path, coco_info):
-    current_path = os.getcwd()
+#指定した画像できちんと物体の位置が特定できているかDebugするための処理。(複数枚)
+#現在は、引数のcoco_infoの数分だけ処理が走る。
+def specified_num_detection_debug(coco_info):
     img_dir = "./images/train2014/"
     for item in coco_info:
-        img_name = item["img_number"]
-        full_path = coco_img_path + img_name
-        shutil.copy(full_path, img_dir + img_name)
+        img = cv2.imread(img_dir + item["img_number"])
+        for bbox in item["bboxes"]:
+            xmin = round(bbox[0])
+            ymin = round(bbox[1])
+            xmax = round(bbox[2])
+            ymax = round(bbox[3])
+
+            img = cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 255, 0), 3)
+            cv2.imwrite("./debug/" + item["img_number"], img)
 
 if __name__ == "__main__":
     coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
@@ -178,5 +195,6 @@ if __name__ == "__main__":
     cofirm_dir()
     coco_info = get_ob_info(coco_json_path, categories)
     make_xml(coco_info, label_dic)
-    one_detection_debug()
     make_img(coco_img_path, coco_info)
+    one_detection_debug()
+    specified_num_detection_debug(coco_info)
