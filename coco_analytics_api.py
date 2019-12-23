@@ -55,19 +55,44 @@ def get_ob_index(datapath, categories):
 def make_xml(coco_info):
     root = et.Element('annotation')
 
-    fruits = et.SubElement(root, 'fruits')
-     
-    fruit = et.SubElement(fruits, 'fruit')
-    fruit_id = et.SubElement(fruit, 'name')
-    fruit_id.text = 'apple'
-    fruit_id = et.SubElement(fruit, 'price')
-    fruit_id.text = '100'
-     
-    fruit = et.SubElement(fruits, 'fruit')
-    fruit_id = et.SubElement(fruit, 'name')
-    fruit_id.text = 'orange'
-    fruit_id = et.SubElement(fruit, 'price')
-    fruit_id.text = '200'
+    folder = et.SubElement(root, 'folder')
+    folder.text = 'JPEGImages'
+    filename = et.SubElement(root, 'filename')
+    filename.text = 'sample.jpg'
+    filepath = et.SubElement(root, 'path')
+    filepath.text = '/home/gisen/Videos/FOX/JPEGImages/****.jpg'
+    source = et.SubElement(root, 'source')
+    database = et.SubElement(source, 'database')
+    database.text = 'Unknown'
+    img_size = et.SubElement(root, 'size')
+    img_width = et.SubElement(img_size, 'width')
+    img_width.text = "640"
+    img_height = et.SubElement(img_size, 'height')
+    img_height.text = "480"
+    img_depth = et.SubElement(img_size, 'depth')
+    img_depth.text = "3"
+    img_seg = et.SubElement(root, 'segmented')
+    img_seg.text = "0"
+
+    img_obj = et.SubElement(root, 'object')
+    obj_name = et.SubElement(img_obj, 'name')
+    obj_name.text = 'fox'
+    obj_pose = et.SubElement(img_obj, 'pose')
+    obj_pose.text = "Unspecified"
+    truncated = et.SubElement(img_obj, 'truncated')
+    truncated.text = "0"
+    difficult = et.SubElement(img_obj, 'difficult')
+    difficult.text = "0"
+
+    bndbox = et.SubElement(img_obj, 'bndbox')
+    bndbox_xmin = et.SubElement(bndbox, 'xmin')
+    bndbox_xmin.text = "30"
+    bndbox_ymin = et.SubElement(bndbox, 'ymin')
+    bndbox_ymin.text = "40"
+    bndbox_xmax = et.SubElement(bndbox, 'xmax')
+    bndbox_xmax.text = "210"
+    bndbox_ymax = et.SubElement(bndbox, 'ymax')
+    bndbox_ymax.text = "160"
 
     ####
     # 文字列パースを介してminidomへ移す
@@ -82,7 +107,8 @@ def make_xml(coco_info):
     #####
 
 if __name__ == "__main__":
-    datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    datapath = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    #datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
     #print('get_ob_index: ', get_ob_index(datapath, categories))
     coco_info = get_ob_index(datapath, categories)
