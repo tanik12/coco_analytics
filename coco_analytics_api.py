@@ -35,7 +35,12 @@ def get_ob_index(datapath, categories):
             height = img_idx["height"]
             width = img_idx["width"]
             for k in anno_idxes:
-                bboxes.append(coco.loadAnns(k)[0]['bbox'])
+                bbox = coco.loadAnns(k)[0]['bbox']
+                bbox[2] = bbox[0] + bbox[2]
+                bbox[3] = bbox[1] + bbox[3]
+
+                #bboxes.append(coco.loadAnns(k)[0]['bbox']) #bboxの中身が[xmin, ymin, width, height]の場合(COCO形式で扱いたいとき)
+                bboxes.append(bbox)                         #bboxの中身が[xmin, ymin, xmax, ymax]の場合(VOC形式で扱いたい時)
                 category_idxes.append(coco.loadAnns(k)[0]['category_id'])
         count += 1
         print("ano_num2: ", anno_idxes)
