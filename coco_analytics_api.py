@@ -47,15 +47,15 @@ def get_ob_info(datapath, categories):
         #coco.getAnnIds(画像番号)により、画像番号に紐づいたアノテーション番号を取得できる.
         file_number = img_idx['file_name'].replace("COCO_train2014_", "").replace(".jpg", "").lstrip("0")
         annos_num = coco.getAnnIds(int(file_number)) #指定した画像ID に対応するアノテーション ID を取得する。
-        print("anno_num: ", annos_num)
+        #print("anno_num: ", annos_num)
         
         for anno_num in annos_num:
             anno_info = coco.loadAnns(anno_num) #loadAnns で指定したアノテーション ID の情報を取得する。
             if anno_info[0]["category_id"] in categories: #欲しいカテゴリがあるかどうか
                 anno_idxes.append(anno_num) #annotationの番号を入れる。
         if len(anno_idxes) < 1: #欲しいカテゴリがないのであればスキップ
-            print("non indx")
-            print("===============")
+            #print("non indx")
+            #print("===============")
             continue
         else:           #欲しいカテゴリがあれば、元imageの[高さ, 幅]とannotationからbboxとcategory_idを取得
             height = img_idx["height"]
@@ -68,9 +68,9 @@ def get_ob_info(datapath, categories):
                 #bboxes.append(coco.loadAnns(k)[0]['bbox']) #bboxの中身が[xmin, ymin, width, height]の場合(COCO形式で扱いたいとき)
                 bboxes.append(bbox)                         #bboxの中身が[xmin, ymin, xmax, ymax]の場合(VOC形式で扱いたい時)
                 category_idxes.append(coco.loadAnns(k)[0]['category_id'])
-        count += 1
-        print("ano_num2: ", anno_idxes)
-        print("\n")
+        #count += 1
+        #print("ano_num2: ", anno_idxes)
+        #print("\n")
 
         #imageに紐づいた情報を取得.
         #画像名、画像に紐づいたアノテーションの番号、元画像の[高さ, 幅]、annotationに紐づくbboxes、category_idに紐づいたbboxを辞書に入れる.
@@ -80,10 +80,10 @@ def get_ob_info(datapath, categories):
         s_dict["bboxes"] = bboxes
         s_dict["category_id"] = category_idxes
         list_idx.append(s_dict)
-
-        print("================")
-        if count == 10:
-            return list_idx
+        #print("================")
+        #if count == 10:
+        #    return list_idx
+    return list_idx
 
 #coco形式のアノテーション情報からvoc形式のアノテーションを作成。
 #make_xml関数の引数は、get_ob_info関数で取得したアノテーション情報と変数label_dicの2つ。
