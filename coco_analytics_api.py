@@ -2,6 +2,10 @@ import json
 from pycocotools.coco import COCO
 import xml.etree.ElementTree as et
 import xml.dom.minidom as md
+import numpy as np
+import sys
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+import cv2
 
 def get_ob_index(datapath, categories):
     with open(datapath, "rb") as file:
@@ -67,7 +71,7 @@ def make_xml(coco_info, label_dic):
         folder = et.SubElement(root, 'folder')
         folder.text = 'VOCORIGINAL'
         filename = et.SubElement(root, 'filename')
-        img_name = item['img_number'].replace("COCO_train", "")
+        img_name = item['img_number']
         filename.text = img_name
         filepath = et.SubElement(root, 'path')
         filepath.text = "/home/gisen/git/coco_analytics/annotation/" + img_name
@@ -116,6 +120,22 @@ def make_xml(coco_info, label_dic):
         tree = et.parse("./annotation/" + img_name.replace(".jpg", ".xml")) 
         tree.write("./annotation/" + img_name.replace(".jpg", ".xml"))
 
+def one_detection_debug():
+    img_path = "./debug/COCO_train2014_000000392136.jpg"
+    img = cv2.imread(img_path)
+
+    # 長方形（水色の長方形）
+    img = cv2.rectangle(img,(19,20),(289,249),(255,255,0),3)
+    img = cv2.rectangle(img,(295,110),(445,326),(255,255,0),3)
+    img = cv2.rectangle(img,(278,161),(314,265),(255,255,0),3)
+    img = cv2.rectangle(img,(274,176),(288,187),(255,255,0),3)
+    img = cv2.rectangle(img,(411,171),(426,198),(255,255,0),3)
+    img = cv2.rectangle(img,(403,167),(469,325),(255,255,0),3)
+    img = cv2.rectangle(img,(390,170),(413,196),(255,255,0),3)
+    img = cv2.rectangle(img,(457,163),(478,281),(255,255,0),3)
+    img = cv2.rectangle(img,(314,174),(328,195),(255,255,0),3)
+    cv2.imwrite("./debug/rect_text.jpg", img)
+
 if __name__ == "__main__":
     datapath = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     #datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
@@ -124,3 +144,4 @@ if __name__ == "__main__":
     #print('get_ob_index: ', get_ob_index(datapath, categories))
     coco_info = get_ob_index(datapath, categories)
     print(make_xml(coco_info, label_dic))
+    one_detection_debug()
