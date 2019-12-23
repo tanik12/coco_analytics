@@ -13,11 +13,17 @@ def cofirm_dir():
     current_path = os.getcwd()
     dirpath_anno = '/annotation'
     dirpath_debug = '/debug'
+    dirpath_image_parent_ = '/images'
+    dirpath_image = '/images/train2014'
 
     if not os.path.isdir(current_path + dirpath_anno):
         os.mkdir("." + dirpath_anno)
     if not os.path.isdir(current_path + dirpath_debug):
         os.mkdir("." + dirpath_debug)
+    if not os.path.isdir(current_path + dirpath_image_parent_):
+        os.mkdir("." + dirpath_image_parent_)
+    if not os.path.isdir(current_path + dirpath_image):
+        os.mkdir("." + dirpath_image)
 
 def get_ob_index(datapath, categories):
     with open(datapath, "rb") as file:
