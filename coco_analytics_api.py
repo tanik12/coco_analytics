@@ -58,8 +58,9 @@ def get_ob_index(datapath, categories):
         if count == 10:
             return list_idx
 def make_xml(coco_info, label_dic):
-
-    print(coco_info)
+    #coco形式のアノテーション情報からvoc形式のアノテーションを作成。
+    #make_xml関数の引数は、get_ob_index関数で取得したアノテーション情報と変数label_dicの2つ。
+    #アノテーションは、ファイル名 ＋ .xmlで保存される。
     for item in coco_info:
         root = et.Element('annotation')
     
@@ -83,6 +84,7 @@ def make_xml(coco_info, label_dic):
         img_seg = et.SubElement(root, 'segmented')
         img_seg.text = "0"
     
+        #objectの数だけbboxを取得する。
         for num in range(len(item['category_id'])):
             img_obj = et.SubElement(root, 'object')
             obj_name = et.SubElement(img_obj, 'name')
@@ -104,7 +106,6 @@ def make_xml(coco_info, label_dic):
             bndbox_ymax = et.SubElement(bndbox, 'ymax')
             bndbox_ymax.text = str(round(item['bboxes'][num][3]))
     
-        ####
         # 文字列パースを介してminidomへ移す
         document = md.parseString(et.tostring(root))
         file = open("./annotation/" + img_name.replace(".jpg", ".xml"), 'w')
@@ -114,7 +115,6 @@ def make_xml(coco_info, label_dic):
         #xmlタグを消した
         tree = et.parse("./annotation/" + img_name.replace(".jpg", ".xml")) 
         tree.write("./annotation/" + img_name.replace(".jpg", ".xml"))
-        #####
 
 if __name__ == "__main__":
     datapath = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
