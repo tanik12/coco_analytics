@@ -3,9 +3,20 @@ from pycocotools.coco import COCO
 import xml.etree.ElementTree as et
 import xml.dom.minidom as md
 import numpy as np
+import os
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
+
+def cofirm_dir():
+    current_path = os.getcwd()
+    dirpath_anno = '/annotation'
+    dirpath_debug = '/debug'
+
+    if not os.path.isdir(current_path + dirpath_anno):
+        os.mkdir("." + dirpath_anno)
+    if not os.path.isdir(current_path + dirpath_debug):
+        os.mkdir("." + dirpath_debug)
 
 def get_ob_index(datapath, categories):
     with open(datapath, "rb") as file:
@@ -142,6 +153,8 @@ if __name__ == "__main__":
     categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
     label_dic = {1:"person", 2:"bicycle", 3:"car", 4:"motorbike", 6:"bus", 8:"truck", 10:"traffic light", 16:"bird", 17:"cat", 18:"dog"}
     #print('get_ob_index: ', get_ob_index(datapath, categories))
+
+    cofirm_dir()
     coco_info = get_ob_index(datapath, categories)
     print(make_xml(coco_info, label_dic))
     one_detection_debug()
