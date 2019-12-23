@@ -52,64 +52,70 @@ def get_ob_index(datapath, categories):
         print("================")
         if count == 10:
             return list_idx
-def make_xml(coco_info):
-    root = et.Element('annotation')
+def make_xml(coco_info, label_dic):
 
-    folder = et.SubElement(root, 'folder')
-    folder.text = 'JPEGImages'
-    filename = et.SubElement(root, 'filename')
-    filename.text = 'sample.jpg'
-    filepath = et.SubElement(root, 'path')
-    filepath.text = '/home/gisen/Videos/FOX/JPEGImages/****.jpg'
-    source = et.SubElement(root, 'source')
-    database = et.SubElement(source, 'database')
-    database.text = 'Unknown'
-    img_size = et.SubElement(root, 'size')
-    img_width = et.SubElement(img_size, 'width')
-    img_width.text = "640"
-    img_height = et.SubElement(img_size, 'height')
-    img_height.text = "480"
-    img_depth = et.SubElement(img_size, 'depth')
-    img_depth.text = "3"
-    img_seg = et.SubElement(root, 'segmented')
-    img_seg.text = "0"
-
-    img_obj = et.SubElement(root, 'object')
-    obj_name = et.SubElement(img_obj, 'name')
-    obj_name.text = 'fox'
-    obj_pose = et.SubElement(img_obj, 'pose')
-    obj_pose.text = "Unspecified"
-    truncated = et.SubElement(img_obj, 'truncated')
-    truncated.text = "0"
-    difficult = et.SubElement(img_obj, 'difficult')
-    difficult.text = "0"
-
-    bndbox = et.SubElement(img_obj, 'bndbox')
-    bndbox_xmin = et.SubElement(bndbox, 'xmin')
-    bndbox_xmin.text = "30"
-    bndbox_ymin = et.SubElement(bndbox, 'ymin')
-    bndbox_ymin.text = "40"
-    bndbox_xmax = et.SubElement(bndbox, 'xmax')
-    bndbox_xmax.text = "210"
-    bndbox_ymax = et.SubElement(bndbox, 'ymax')
-    bndbox_ymax.text = "160"
-
-    ####
-    # 文字列パースを介してminidomへ移す
-    document = md.parseString(et.tostring(root))
-    file = open('test.xml', 'w')
-    # エンコーディング、改行、全体のインデント、子要素の追加インデントを設定しつつファイルへ書き出し
-    document.writexml(file, encoding='utf-8', newl='\n', indent='', addindent='  ')
-    file.close()
-    #xmlタグを消した
-    tree = et.parse('test.xml') 
-    tree.write('test.xml')
-    #####
+    print(coco_info)
+    for item in coco_info:
+        root = et.Element('annotation')
+    
+        folder = et.SubElement(root, 'folder')
+        folder.text = 'VOCORIGINAL'
+        filename = et.SubElement(root, 'filename')
+        img_name = item['img_number'].replace("COCO_train", "")
+        filename.text = img_name
+        filepath = et.SubElement(root, 'path')
+        filepath.text = "/home/gisen/git/coco_analytics/annotation/" + img_name
+        source = et.SubElement(root, 'source')
+        database = et.SubElement(source, 'database')
+        database.text = 'Unknown'
+        img_size = et.SubElement(root, 'size')
+        img_width = et.SubElement(img_size, 'width')
+        img_width.text = str(item['img_hw'][1])
+        img_height = et.SubElement(img_size, 'height')
+        img_height.text = str(item['img_hw'][0])
+        img_depth = et.SubElement(img_size, 'depth')
+        img_depth.text = "3"
+        img_seg = et.SubElement(root, 'segmented')
+        img_seg.text = "0"
+    
+        for num in range(len(item['category_id'])):
+            img_obj = et.SubElement(root, 'object')
+            obj_name = et.SubElement(img_obj, 'name')
+            obj_name.text = str(label_dic[item['category_id'][num]])
+            obj_pose = et.SubElement(img_obj, 'pose')
+            obj_pose.text = "Unspecified"
+            truncated = et.SubElement(img_obj, 'truncated')
+            truncated.text = "0"
+            difficult = et.SubElement(img_obj, 'difficult')
+            difficult.text = "0"
+        
+            bndbox = et.SubElement(img_obj, 'bndbox')
+            bndbox_xmin = et.SubElement(bndbox, 'xmin')
+            bndbox_xmin.text = str(round(item['bboxes'][num][0]))
+            bndbox_ymin = et.SubElement(bndbox, 'ymin')
+            bndbox_ymin.text = str(round(item['bboxes'][num][1]))
+            bndbox_xmax = et.SubElement(bndbox, 'xmax')
+            bndbox_xmax.text = str(round(item['bboxes'][num][2]))
+            bndbox_ymax = et.SubElement(bndbox, 'ymax')
+            bndbox_ymax.text = str(round(item['bboxes'][num][3]))
+    
+        ####
+        # 文字列パースを介してminidomへ移す
+        document = md.parseString(et.tostring(root))
+        file = open("./annotation/" + img_name.replace(".jpg", ".xml"), 'w')
+        # エンコーディング、改行、全体のインデント、子要素の追加インデントを設定しつつファイルへ書き出し
+        document.writexml(file, encoding='utf-8', newl='\n', indent='', addindent='  ')
+        file.close()
+        #xmlタグを消した
+        tree = et.parse("./annotation/" + img_name.replace(".jpg", ".xml")) 
+        tree.write("./annotation/" + img_name.replace(".jpg", ".xml"))
+        #####
 
 if __name__ == "__main__":
     datapath = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     #datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
+    label_dic = {1:"person", 2:"bicycle", 3:"car", 4:"motorbike", 6:"bus", 8:"truck", 10:"traffic light", 16:"bird", 17:"cat", 18:"dog"}
     #print('get_ob_index: ', get_ob_index(datapath, categories))
     coco_info = get_ob_index(datapath, categories)
-    print(make_xml(coco_info))
+    print(make_xml(coco_info, label_dic))
