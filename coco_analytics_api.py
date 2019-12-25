@@ -14,19 +14,22 @@ import cv2
 #ないのであればディレクトリを作成。
 def cofirm_dir():
     current_path = os.getcwd()
-    dirpath_anno = '/annotation'
+    dirpath_anno = '/Annotations'
     dirpath_debug = '/debug'
-    dirpath_image_parent_ = '/images'
-    dirpath_image = '/images/train2014'
+    dirpath_image = '/JPEGImages'
+    dirpath_trainval_parent = '/ImageSets'
+    dirpath_trainval = '/ImageSets/Main'
 
     if not os.path.isdir(current_path + dirpath_anno):
         os.mkdir("." + dirpath_anno)
     if not os.path.isdir(current_path + dirpath_debug):
         os.mkdir("." + dirpath_debug)
-    if not os.path.isdir(current_path + dirpath_image_parent_):
-        os.mkdir("." + dirpath_image_parent_)
     if not os.path.isdir(current_path + dirpath_image):
         os.mkdir("." + dirpath_image)
+    if not os.path.isdir(current_path + dirpath_trainval_parent):
+        os.mkdir("." + dirpath_trainval_parent)
+    if not os.path.isdir(current_path + dirpath_trainval):
+        os.mkdir("." + dirpath_trainval)
 
 #cocoのjsonを読み込んでvoc形式に必要な情報を取得する処理。
 def get_ob_info(datapath, categories):
@@ -61,7 +64,7 @@ def get_ob_info(datapath, categories):
             height = img_idx["height"]
             width = img_idx["width"]
             for k in anno_idxes:
-                #bbox = coco.loadAnns(k)[0]['bbox']
+                bbox = coco.loadAnns(k)[0]['bbox']
                 bbox[2] = bbox[0] + bbox[2]
                 bbox[3] = bbox[1] + bbox[3]
 
@@ -98,7 +101,7 @@ def make_xml(coco_info, label_dic):
         img_name = item['img_number']
         filename.text = img_name
         filepath = et.SubElement(root, 'path')
-        filepath.text = "/home/gisen/git/coco_analytics/annotation/" + img_name
+        filepath.text = "/home/gisen/git/coco_analytics/Annotations/" + img_name
         source = et.SubElement(root, 'source')
         database = et.SubElement(source, 'database')
         database.text = 'Unknown'
@@ -136,18 +139,18 @@ def make_xml(coco_info, label_dic):
     
         # 文字列パースを介してminidomへ移す
         document = md.parseString(et.tostring(root))
-        file = open("./annotation/" + img_name.replace(".jpg", ".xml"), 'w')
+        file = open("./Annotations/" + img_name.replace(".jpg", ".xml"), 'w')
         # エンコーディング、改行、全体のインデント、子要素の追加インデントを設定しつつファイルへ書き出し
         document.writexml(file, encoding='utf-8', newl='\n', indent='', addindent='  ')
         file.close()
         #xmlタグを消した
-        tree = et.parse("./annotation/" + img_name.replace(".jpg", ".xml")) 
-        tree.write("./annotation/" + img_name.replace(".jpg", ".xml"))
+        tree = et.parse("./Annotations/" + img_name.replace(".jpg", ".xml")) 
+        tree.write("./Annotations/" + img_name.replace(".jpg", ".xml"))
 
 #アノテーションの情報を基にcocoで使用している画像をコピーする処理。
 def make_img(coco_img_path, coco_info):
     current_path = os.getcwd()
-    img_dir = "./images/train2014/"
+    img_dir = "./JPEGImages/"
     for item in coco_info:
         img_name = item["img_number"]
         full_path = coco_img_path + img_name
@@ -173,7 +176,7 @@ def one_detection_debug():
 #指定した画像できちんと物体の位置が特定できているかDebugするための処理。(複数枚)
 #現在は、引数のcoco_infoの数分だけ処理が走る。
 def specified_num_detection_debug(coco_info):
-    img_dir = "./images/train2014/"
+    img_dir = "./JPEGImages/"
     for item in coco_info:
         img = cv2.imread(img_dir + item["img_number"])
         for bbox in item["bboxes"]:
@@ -185,16 +188,17 @@ def specified_num_detection_debug(coco_info):
             img = cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 255, 0), 3)
             cv2.imwrite("./debug/" + item["img_number"], img)
 
+#train data と val data に分ける
 def train_val_split(coco_info):
     num = len(coco_info)
-    f_train = open("train.txt", "w")
-    f_val = open("val.txt", "w")
+    f_train = open("./ImageSets/Main/train.txt", "w")
+    f_val = open("./ImageSets/Main/val.txt", "w")
     count = 0
     for item in coco_info:
         if int(num * 0.8) > count:
-            f_train.write(item["img_number"] + "\n")
+            f_train.write(item["img_number"].replace(".jpg", "") + "\n")
         else:
-            f_val.write(item["img_number"] + "\n")
+            f_val.write(item["img_number"].replace(".jpg", "") + "\n")
     
         count += 1
     
@@ -202,9 +206,14 @@ def train_val_split(coco_info):
     f_val.close()
 
 if __name__ == "__main__":
+    #Ubuntu用
     coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
-    #datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     coco_img_path = "/home/gisen/data/coco/images/train2014/"
+    
+    #Mac用
+    #coco_json_path = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    #coco_img_path = "/Users/gisen/data/coco/images/train2014/"
+
     categories = [1, 2, 3, 4, 6, 8, 10, 16, 17, 18]
     label_dic = {1:"person", 2:"bicycle", 3:"car", 4:"motorbike", 6:"bus", 8:"truck", 10:"traffic light", 16:"bird", 17:"cat", 18:"dog"}
 
@@ -213,5 +222,5 @@ if __name__ == "__main__":
     make_xml(coco_info, label_dic)
     make_img(coco_img_path, coco_info)
     one_detection_debug()
-    specified_num_detection_debug(coco_info)
+    #specified_num_detection_debug(coco_info)
     train_val_split(coco_info)
