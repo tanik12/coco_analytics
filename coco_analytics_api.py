@@ -61,7 +61,7 @@ def get_ob_info(datapath, categories):
             height = img_idx["height"]
             width = img_idx["width"]
             for k in anno_idxes:
-                bbox = coco.loadAnns(k)[0]['bbox']
+                #bbox = coco.loadAnns(k)[0]['bbox']
                 bbox[2] = bbox[0] + bbox[2]
                 bbox[3] = bbox[1] + bbox[3]
 
@@ -185,6 +185,22 @@ def specified_num_detection_debug(coco_info):
             img = cv2.rectangle(img, (xmin, ymin), (xmax, ymax), (255, 255, 0), 3)
             cv2.imwrite("./debug/" + item["img_number"], img)
 
+def train_val_split(coco_info):
+    num = len(coco_info)
+    f_train = open("train.txt", "w")
+    f_val = open("val.txt", "w")
+    count = 0
+    for item in coco_info:
+        if int(num * 0.8) > count:
+            f_train.write(item["img_number"] + "\n")
+        else:
+            f_val.write(item["img_number"] + "\n")
+    
+        count += 1
+    
+    f_train.close()
+    f_val.close()
+
 if __name__ == "__main__":
     coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
     #datapath = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
@@ -198,3 +214,4 @@ if __name__ == "__main__":
     make_img(coco_img_path, coco_info)
     one_detection_debug()
     specified_num_detection_debug(coco_info)
+    train_val_split(coco_info)
