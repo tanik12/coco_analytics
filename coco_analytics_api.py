@@ -252,6 +252,17 @@ def confirm_category_num(coco_info):
     plt.bar(left, label_num, tick_label=label_name, align="center")
     plt.show()
 
+#traffic lightが写っている画像を抽出。これは多分使わない。
+def extract_traffic_light_img(coco_img_path, coco_info):
+    for items in coco_info:
+        categories = items['category_id']
+        if 10 in categories:
+           current_path = os.getcwd()
+           img_dir = "./test/"
+           img_name = items["img_number"]
+           full_path = coco_img_path + img_name
+           shutil.copy(full_path, img_dir + img_name)
+
 if __name__ == "__main__":
     #Ubuntu用
     coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
@@ -272,3 +283,4 @@ if __name__ == "__main__":
     #specified_num_detection_debug(coco_info)
     train_val_split(coco_info)
     confirm_category_num(coco_info)
+    #extract_traffic_light_img(coco_img_path, coco_info)
