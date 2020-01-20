@@ -46,6 +46,7 @@ def get_ob_info(datapath, categories):
         anno_idxes = []
         bboxes = []
         category_idxes = []
+        traffic_light_flag = False
 
         #画像名から番号を取得
         #coco.getAnnIds(画像番号)により、画像番号に紐づいたアノテーション番号を取得できる.
@@ -55,8 +56,15 @@ def get_ob_info(datapath, categories):
         
         for anno_num in annos_num:
             anno_info = coco.loadAnns(anno_num) #loadAnns で指定したアノテーション ID の情報を取得する。
-            if anno_info[0]["category_id"] in categories: #欲しいカテゴリがあるかどうか
+            if anno_info[0]["category_id"] in categories and (traffic_light_flag == False): #欲しいカテゴリがあるかどうか
+                if anno_info[0]["category_id"] == 10: #もしtraffic light があればbreak
+                    traffic_light_flag == True
+                    break
                 anno_idxes.append(anno_num) #annotationの番号を入れる。
+        
+        if traffic_light_flag: #traffic light がひとつでもあったらその画像は取得しない。
+            break
+            
         if len(anno_idxes) < 1: #欲しいカテゴリがないのであればスキップ
             #print("non indx")
             #print("===============")
@@ -244,7 +252,7 @@ def confirm_category_num(coco_info):
     plt.bar(left, label_num, tick_label=label_name, align="center")
     plt.show()
 
-#traffic lightが写っている画像を抽出
+#traffic lightが写っている画像を抽出。これは多分使わない。
 def extract_traffic_light_img(coco_img_path, coco_info):
     for items in coco_info:
         categories = items['category_id']
@@ -275,4 +283,4 @@ if __name__ == "__main__":
     #specified_num_detection_debug(coco_info)
     train_val_split(coco_info)
     confirm_category_num(coco_info)
-    extract_traffic_light_img(coco_img_path, coco_info)
+    #extract_traffic_light_img(coco_img_path, coco_info)
