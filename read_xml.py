@@ -34,6 +34,7 @@ def read_xml_info(xml_fullpath_list, label_name_list):
         #徐々に子ツリーを見ていく
         for item in tree_child: 
             if item.tag == "path":
+                xml_info_chunk.append(xml_fullpath)
                 xml_info_chunk.append(item.text)
             if item.tag == "object":
                 for name in item.findall('name'):
@@ -45,9 +46,8 @@ def read_xml_info(xml_fullpath_list, label_name_list):
             
         xml_info_mass.append(xml_info_chunk)
     
-    colum_list = ["xml_path", "traffic signal count", "pedestrian signal count", "person count", "bicycle count", "car count", "motorbike count", "bus count", "truck count", "dog count", "cat count"]
+    colum_list = ["xml_path", "img_path", "traffic signal count", "pedestrian signal count", "person count", "bicycle count", "car count", "motorbike count", "bus count", "truck count", "dog count", "cat count"]
     df = pd.DataFrame(xml_info_mass, columns=colum_list)
-    #df = pd.DataFrame(xml_info_mass, columns=list("xml_path", "traffic signal count", "pedestrian signal count", "person count", "bicycle count", "car count", "motorbike count", "bus count", "truck count", "dog count", "cat count"))
         
     return df
 
@@ -61,3 +61,20 @@ if __name__ == "__main__":
     df = read_xml_info(xml_fullpathes, label_name)
     
     print(df.head())
+
+    print("データの総数：", len(df))
+
+    traffic_signal_count    = (df["traffic signal count"] > 0).sum()
+    pedestrian_signal_count = (df["pedestrian signal count"] > 0).sum()
+    person_count            = (df["person count"] > 0).sum()
+    bicycle_count           = (df["bicycle count"] > 0).sum()
+    car_count               = (df["car count"] > 0).sum()
+    motorbike_count         = (df["motorbike count"] > 0).sum()
+    bus_count               = (df["bus count"] > 0).sum()
+    truck_count             = (df["truck count"] > 0).sum()
+    dog_count               = (df["dog count"] > 0).sum()
+    cat_count               = (df["cat count"] > 0).sum()
+
+    print(traffic_signal_count, pedestrian_signal_count, person_count, bicycle_count,
+          car_count, motorbike_count, bus_count, truck_count, dog_count, cat_count)
+
