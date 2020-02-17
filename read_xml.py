@@ -6,12 +6,34 @@ import sys
 import re
 
 import pandas as pd
+import shutil
 
-def get_xml_name():
+#ディレクトリの存在確認をする処理。
+#ないのであればディレクトリを作成。
+def cofirm_dir():
+    current_path = os.getcwd()
+    dirpath_anno = '/Annotations'
+    dirpath_debug = '/debug'
+    dirpath_image = '/JPEGImages'
+    dirpath_trainval_parent = '/ImageSets'
+    dirpath_trainval = '/ImageSets/Main'
+
+    if not os.path.isdir(current_path + dirpath_anno):
+        os.mkdir("." + dirpath_anno)
+    if not os.path.isdir(current_path + dirpath_debug):
+        os.mkdir("." + dirpath_debug)
+    if not os.path.isdir(current_path + dirpath_image):
+        os.mkdir("." + dirpath_image)
+    if not os.path.isdir(current_path + dirpath_trainval_parent):
+        os.mkdir("." + dirpath_trainval_parent)
+    if not os.path.isdir(current_path + dirpath_trainval):
+        os.mkdir("." + dirpath_trainval)
+
+def get_xml_name(path):
     xml_names = []
 
     # 拡張子.xmlのファイルを取得する
-    xml_fullpath = '/home/gisen/data_own_nobird/VOCdevkit/VOC_own/Annotations/*.xml'
+    xml_fullpath = path +'Annotations/*.xml'
     # xmlを取得する
     xml_fullpath_lists = glob.glob(xml_fullpath)
     for path in xml_fullpath_lists:
@@ -133,13 +155,50 @@ def get_df_data(df, rand_sample=720):
     
     return df, df_2
 
+def file_copy(df_resample, org_copy_path):
+    
+    org_anno_path = org_copy_path + "Annotations"
+    org_img_path = org_copy_path + "JPEGImages"    
+
+    current_path = os.getcwd()
+    anno_path = current_path + "/" + "Annotations"
+    img_path = current_path + "/" + "JPEGImages"
+
+    for i in range(len(df_resample)):
+        #######
+        #copy後の名前を決定
+        df_xml_path = (df_resample["xml_path"][i:i+1].tolist())[0]
+        df_img_path = (df_resample["img_path"][i:i+1].tolist())[0]
+        
+        xml_filename = os.path.basename(df_xml_path)
+        img_filename = os.path.basename(df_img_path)
+
+        #コピー元
+        org_xml_fullpath = org_anno_path + "/" + xml_filename
+        org_img_fullpath = org_img_path + "/" + img_filename
+
+        #コピー後の名前
+        xml_fullpath = anno_path + "/" + xml_filename
+        img_fullpath = img_path + "/" + img_filename
+        #######
+
+        shutil.copy(org_xml_fullpath, xml_fullpath)
+        shutil.copy(org_img_fullpath, img_fullpath)
+
+
 def main():
+    xml_path = '/home/gisen/data_own_nobird/VOCdevkit/VOC_own/'
     label_name = ["traffic signal", "pedestrian signal", "person", "bicycle", "car", "motorbike", "bus", "truck", "dog", "cat"]
 
-    xml_fullpathes, xml_namees = get_xml_name()
+    xml_fullpathes, xml_namees = get_xml_name(xml_path)
     df = read_xml_info(xml_fullpathes, label_name)
 
     data_org, data_resample =  get_df_data(df)
+    cofirm_dir()
+    print(os.getcwd())
+    print(data_resample["xml_path"][0:1].tolist())
+    print(data_resample["img_path"][0:1].tolist())
+    file_copy(data_resample, xml_path)
 
 
 if __name__ == "__main__":
