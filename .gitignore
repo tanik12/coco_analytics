@@ -1,0 +1,12 @@
+# General
+.DS_Store
+*.swap
+*.pyc
+__pycache__/
+
+#annotation
+annotation/*.xml
+debug/*.jpg
+images/*
+
+VOCdevkit
