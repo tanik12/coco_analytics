@@ -114,7 +114,8 @@ def make_xml(coco_info, label_dic):
         img_name = item['img_number']
         filename.text = img_name
         filepath = et.SubElement(root, 'path')
-        filepath.text = "/home/gisen/git/coco_analytics/Annotations/" + img_name
+        filepath.text = "/home/gisen/git/coco_analytics/src/Annotations/" + img_name
+        #filepath.text = "/home/gisen/git/coco_analytics/Annotations/" + img_name
         source = et.SubElement(root, 'source')
         database = et.SubElement(source, 'database')
         database.text = 'Unknown'
