@@ -11,8 +11,8 @@ import sys
 #sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 
-from voc2coco import *
-from visualize import confirm_category_num
+from .voc2coco import *
+from .visualize import confirm_category_num
 
 #ディレクトリの存在確認をする処理。
 #ないのであればディレクトリを作成。
