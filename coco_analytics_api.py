@@ -12,6 +12,8 @@ import sys
 #sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 
+from utils.voc2coco import *
+
 #ディレクトリの存在確認をする処理。
 #ないのであればディレクトリを作成。
 def cofirm_dir():
@@ -214,11 +216,11 @@ def train_val_split(coco_info):
         else:
             f_val.write(item["img_number"].replace(".jpg", "") + "\n")
 
-        match = regex.findall(item["img_number"])
-        print(match)
+        #match = regex.findall(item["img_number"])
+        #print(match)
 
-        f_train_val.write(match[-1] + ".xml" + "\n")
-        #f_train_val.write(item["img_number"].replace(".jpg", "xml") + "\n")
+        #f_train_val.write(match[-1] + ".xml" + "\n")
+        f_train_val.write(item["img_number"].replace("jpg", "xml") + "\n")
         count += 1
     
     f_train_val.close()
@@ -302,3 +304,5 @@ if __name__ == "__main__":
     train_val_split(coco_info)
     confirm_category_num(coco_info)
     #extract_traffic_light_img(coco_img_path, coco_info)
+
+    convert("./ImageSets/Main/xmllist.txt", "./Annotations", "output.json")
