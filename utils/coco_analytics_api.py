@@ -11,8 +11,8 @@ import sys
 #sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 
-from utils.voc2coco import *
-from utils.visualize import confirm_category_num
+from voc2coco import *
+from visualize import confirm_category_num
 
 #ディレクトリの存在確認をする処理。
 #ないのであればディレクトリを作成。
@@ -259,7 +259,3 @@ if __name__ == "__main__":
     #one_detection_debug()
     #specified_num_detection_debug(coco_info)
     train_val_split(coco_info)
-    confirm_category_num(coco_info)
-    #extract_traffic_light_img(coco_img_path, coco_info)
-
-    convert("./ImageSets/Main/xmllist.txt", "./Annotations", "output.json")

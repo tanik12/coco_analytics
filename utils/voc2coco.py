@@ -9,7 +9,7 @@ import xml.etree.ElementTree as ET
 
 START_BOUNDING_BOX_ID = 1
 #PRE_DEFINE_CATEGORIES = {}
-PRE_DEFINE_CATEGORIES = {"traffic signal":1, "pedestrian signal":2, "person":3, "bicycle":4, "car":5, "motorbike":6, "bus":7, "truck":8, "dog":9}
+PRE_DEFINE_CATEGORIES = {"traffic signal":1, "pedestrian signal":2, "person":3, "bicycle":4, "car":5, "motorbike":6, "bus":7, "truck":8, "dog":9, "cat":10}
 # If necessary, pre-define category and its id
 #PRE_DEFINE_CATEGORIES = {"aeroplane": 1, "bicycle": 2, "bird": 3, "boat": 4,
 #                         "bottle":5, "bus": 6, "car": 7, "cat": 8, "chair": 9,
