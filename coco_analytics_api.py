@@ -6,9 +6,10 @@ import numpy as np
 import os
 import shutil
 import matplotlib.pyplot as plt
+import re
 
 import sys
-sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+#sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 
 #ディレクトリの存在確認をする処理。
@@ -41,7 +42,8 @@ def get_ob_info(datapath, categories):
 
     list_idx = []
     count = 0
-    for img_idx in dataset['images']:
+    #for img_idx in dataset['images']:
+    for img_idx in dataset['images'][:100]:
         s_dict = {}
         anno_idxes = []
         bboxes = []
@@ -200,17 +202,26 @@ def specified_num_detection_debug(coco_info):
 #train data と val data に分ける
 def train_val_split(coco_info):
     num = len(coco_info)
+    f_train_val = open("./ImageSets/Main/xmllist.txt", "w")
     f_train = open("./ImageSets/Main/train.txt", "w")
     f_val = open("./ImageSets/Main/val.txt", "w")
     count = 0
+    regex = re.compile('\d+')
+
     for item in coco_info:
         if int(num * 0.8) > count:
             f_train.write(item["img_number"].replace(".jpg", "") + "\n")
         else:
             f_val.write(item["img_number"].replace(".jpg", "") + "\n")
-    
+
+        match = regex.findall(item["img_number"])
+        print(match)
+
+        f_train_val.write(match[-1] + ".xml" + "\n")
+        #f_train_val.write(item["img_number"].replace(".jpg", "xml") + "\n")
         count += 1
     
+    f_train_val.close()
     f_train.close()
     f_val.close()
 
@@ -270,12 +281,12 @@ def extract_traffic_light_img(coco_img_path, coco_info):
 
 if __name__ == "__main__":
     #Ubuntu用
-    coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
-    coco_img_path = "/home/gisen/data/coco/images/train2014/"
+    #coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    #coco_img_path = "/home/gisen/data/coco/images/train2014/"
     
     #Mac用
-    #coco_json_path = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
-    #coco_img_path = "/Users/gisen/data/coco/images/train2014/"
+    coco_json_path = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    coco_img_path = "/Users/gisen/data/coco/images/train2014/"
 
     categories = [1, 2, 3, 4, 6, 8, 10, 17, 18]
     label_dic = {1:"person", 2:"bicycle", 3:"car", 4:"motorbike", 6:"bus", 8:"truck", 10:"traffic light", 17:"cat", 18:"dog"}
