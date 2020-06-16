@@ -8,7 +8,7 @@ import shutil
 import re
 
 import sys
-#sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
+sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
 
 from .voc2coco import *
@@ -209,7 +209,7 @@ def train_val_split(coco_info):
     f_train = open("./ImageSets/Main/train.txt", "w")
     f_val = open("./ImageSets/Main/val.txt", "w")
     count = 0
-    regex = re.compile('\d+')
+    #regex = re.compile('\d+')
 
     for item in coco_info:
         if int(num * 0.8) > count:
