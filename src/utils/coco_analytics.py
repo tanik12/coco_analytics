@@ -5,11 +5,14 @@ import xml.dom.minidom as md
 import numpy as np
 import os
 import shutil
-import matplotlib.pyplot as plt
+import re
 
 import sys
 sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
 import cv2
+
+from .voc2coco import *
+from .visualize import confirm_category_num
 
 #ディレクトリの存在確認をする処理。
 #ないのであればディレクトリを作成。
@@ -41,7 +44,8 @@ def get_ob_info(datapath, categories):
 
     list_idx = []
     count = 0
-    for img_idx in dataset['images']:
+    #for img_idx in dataset['images']:
+    for img_idx in dataset['images'][:100]:
         s_dict = {}
         anno_idxes = []
         bboxes = []
@@ -110,7 +114,8 @@ def make_xml(coco_info, label_dic):
         img_name = item['img_number']
         filename.text = img_name
         filepath = et.SubElement(root, 'path')
-        filepath.text = "/home/gisen/git/coco_analytics/Annotations/" + img_name
+        filepath.text = "/home/gisen/git/coco_analytics/src/Annotations/" + img_name
+        #filepath.text = "/home/gisen/git/coco_analytics/Annotations/" + img_name
         source = et.SubElement(root, 'source')
         database = et.SubElement(source, 'database')
         database.text = 'Unknown'
@@ -200,62 +205,28 @@ def specified_num_detection_debug(coco_info):
 #train data と val data に分ける
 def train_val_split(coco_info):
     num = len(coco_info)
+    f_train_val = open("./ImageSets/Main/xmllist.txt", "w")
     f_train = open("./ImageSets/Main/train.txt", "w")
     f_val = open("./ImageSets/Main/val.txt", "w")
     count = 0
+    #regex = re.compile('\d+')
+
     for item in coco_info:
         if int(num * 0.8) > count:
             f_train.write(item["img_number"].replace(".jpg", "") + "\n")
         else:
             f_val.write(item["img_number"].replace(".jpg", "") + "\n")
-    
+
+        #match = regex.findall(item["img_number"])
+        #print(match)
+
+        #f_train_val.write(match[-1] + ".xml" + "\n")
+        f_train_val.write(item["img_number"].replace("jpg", "xml") + "\n")
         count += 1
     
+    f_train_val.close()
     f_train.close()
     f_val.close()
-
-#各ラベル数を確認するためのもの
-def confirm_category_num(coco_info):
-    label_num = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0])
-    ###label_num = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-    for item in coco_info:
-        label_flag = [False, False, False, False, False, False, False, False, False]
-        ###label_flag = [False, False, False, False, False, False, False, False, False, False]
-        category_nums = np.array(item['category_id'])
-        print("AAAAAAAAAAAA: ", category_nums)
-        for label in category_nums:
-            if label == 1:
-                label_flag[0] = True
-            elif label == 2:
-                label_flag[1] = True
-            elif label == 3:
-                label_flag[2] = True
-            elif label == 4:
-                label_flag[3] = True
-            elif label == 6:
-                label_flag[4] = True
-            elif label == 8:
-                label_flag[5] = True
-            elif label == 10:
-                label_flag[6] = True
-            ###elif label == 16:
-            ###    label_flag[7] = True
-            elif label == 17:
-                label_flag[7] = True
-            elif label == 18:
-                label_flag[8] = True
-         
-        ids = np.where(label_flag)
-        for i in ids:
-            label_num[ids] += 1
-        
-    print(label_num)
-    #left = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-    #label_name = ["person", "bicycle", "car", "motorbike", "bus", "truck", "traffic light", "bird", "cat", "dog"]
-    left = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
-    label_name = ["person", "bicycle", "car", "motorbike", "bus", "truck", "traffic light", "cat", "dog"]
-    plt.bar(left, label_num, tick_label=label_name, align="center")
-    plt.show()
 
 #traffic lightが写っている画像を抽出。これは多分使わない。
 def extract_traffic_light_img(coco_img_path, coco_info):
@@ -270,12 +241,12 @@ def extract_traffic_light_img(coco_img_path, coco_info):
 
 if __name__ == "__main__":
     #Ubuntu用
-    coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
-    coco_img_path = "/home/gisen/data/coco/images/train2014/"
+    #coco_json_path = "/home/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    #coco_img_path = "/home/gisen/data/coco/images/train2014/"
     
     #Mac用
-    #coco_json_path = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
-    #coco_img_path = "/Users/gisen/data/coco/images/train2014/"
+    coco_json_path = "/Users/gisen/data/coco/annotations/annotations/instances_train2014.json" 
+    coco_img_path = "/Users/gisen/data/coco/images/train2014/"
 
     categories = [1, 2, 3, 4, 6, 8, 10, 17, 18]
     label_dic = {1:"person", 2:"bicycle", 3:"car", 4:"motorbike", 6:"bus", 8:"truck", 10:"traffic light", 17:"cat", 18:"dog"}
@@ -289,5 +260,3 @@ if __name__ == "__main__":
     #one_detection_debug()
     #specified_num_detection_debug(coco_info)
     train_val_split(coco_info)
-    confirm_category_num(coco_info)
-    #extract_traffic_light_img(coco_img_path, coco_info)

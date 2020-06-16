@@ -10,6 +10,9 @@ import shutil
 
 from sklearn.model_selection import train_test_split
 
+from utils.file_operation import rename
+from utils.data_split import read, train_val_split
+
 #ディレクトリの存在確認をする処理。
 #ないのであればディレクトリを作成。
 def cofirm_dir():
@@ -187,24 +190,24 @@ def file_copy(df_resample, org_copy_path):
         shutil.copy(org_xml_fullpath, xml_fullpath)
         shutil.copy(org_img_fullpath, img_fullpath)
 
-def train_val_split(df_data):
-    train_data, test_data = train_test_split(df_data, test_size=0.2) 
-    train_path_lists = train_data["img_path"].tolist()
-    test_path_lists = test_data["img_path"].tolist()
-
-    f_train = open("./ImageSets/Main/train.txt", "w")
-    for path in train_path_lists:
-        filename = os.path.basename(path)
-        f_train.write(filename.replace(".jpg", "") + "\n")
-    
-
-    f_test = open("./ImageSets/Main/val.txt", "w")
-    for path in test_path_lists:
-        filename = os.path.basename(path)
-        f_test.write(filename.replace(".jpg", "") + "\n")
-
-    f_train.close()
-    f_test.close()
+###def train_val_split(df_data):
+###    train_data, test_data = train_test_split(df_data, test_size=0.2) 
+###    train_path_lists = train_data["img_path"].tolist()
+###    test_path_lists = test_data["img_path"].tolist()
+###
+###    f_train = open("./ImageSets/Main/train.txt", "w")
+###    for path in train_path_lists:
+###        filename = os.path.basename(path)
+###        f_train.write(filename.replace(".jpg", "") + "\n")
+###    
+###
+###    f_test = open("./ImageSets/Main/val.txt", "w")
+###    for path in test_path_lists:
+###        filename = os.path.basename(path)
+###        f_test.write(filename.replace(".jpg", "") + "\n")
+###
+###    f_train.close()
+###    f_test.close()
 
 def main():
     xml_path = '/home/gisen/data_own_nobird/VOCdevkit/VOC_own/'
@@ -219,7 +222,10 @@ def main():
     print(data_resample["xml_path"][0:1].tolist())
     print(data_resample["img_path"][0:1].tolist())
     file_copy(data_resample, xml_path)
-    train_val_split(data_resample)
+    #train_val_split(data_resample)
+    rename()
+    img_name_lists = read()
+    train_val_split(img_name_lists)
 
 if __name__ == "__main__":
     main()
