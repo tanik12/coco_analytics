@@ -16,4 +16,13 @@
 ・train.txtとval.txtに分ける機能。<br>
 　などがあります。<br>
 ### ◆使い方
-後で追加します。
+後で追加します（まだ説明が不十分です）。<br>
+・coco datasetだけで学習させる場合(欲しいデータだけ！)<br>
+　python main.py<br><br>
+・coco dataset以外も混ぜてやりたい場合<br>
+　1.最初にAnnotationsフォルダとJPEGImagesフォルダを作成<br>
+　2.自分が作成したアノテーションデータと画像をAnnotationsフォルダとJPEGImagesフォルダに格納する。<br>
+　3.pyhon main.py<br>
+
+・equalize_data_number.pyは学習データの数を均等化するためにしようする。<br>
+後で、equalize_data_number.pyのコードの整理をする。<br>
